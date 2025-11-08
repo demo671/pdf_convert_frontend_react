@@ -25,6 +25,7 @@ export const LoginPage: React.FC = () => {
   const [showCompanySelectionModal, setShowCompanySelectionModal] = useState(false)
   const [availableCompanies, setAvailableCompanies] = useState<Array<{ id: number; name: string; rfc: string; email: string }>>([])
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<number[]>([])
+  const [companySelectionError, setCompanySelectionError] = useState('')
 
   // Redirect if user is already logged in
   useEffect(() => {
@@ -208,11 +209,13 @@ export const LoginPage: React.FC = () => {
   }
 
   const toggleCompanySelection = (companyId: number) => {
-    setSelectedCompanyIds(prev => 
+    setSelectedCompanyIds(prev =>
       prev.includes(companyId)
         ? prev.filter(id => id !== companyId)
         : [...prev, companyId]
     )
+    // Clear error when a company is selected
+    setCompanySelectionError('')
   }
 
   const toggleMode = () => {
@@ -594,17 +597,17 @@ export const LoginPage: React.FC = () => {
 
       {/* Company Selection Modal */}
       {showCompanySelectionModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowCompanySelectionModal(false)
-            }
-          }}
         >
           <div className="bg-white rounded-2xl shadow-2xl border border-[#64c7cd]/30 w-full max-w-2xl p-6 relative max-h-[80vh] overflow-y-auto">
             <button
-              onClick={() => setShowCompanySelectionModal(false)}
+              onClick={() => {
+                setShowCompanySelectionModal(false)
+                setSelectedCompanyIds([])
+                setCompanySelectionError('')
+                setLoading(false)
+              }}
               className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
             >
               <XCircle className="h-5 w-5 text-black" />
@@ -618,7 +621,7 @@ export const LoginPage: React.FC = () => {
                 <h3 className="text-xl font-bold text-black">Seleccionar Empresas</h3>
               </div>
               <p className="text-sm text-black/60">
-                Seleccione las empresas con las que trabajará (opcional)
+                Seleccione al menos una empresa con la que trabajará (requerido)
               </p>
               {selectedCompanyIds.length > 0 && (
                 <p className="text-sm text-[#eb3089] font-medium mt-2">
@@ -627,11 +630,20 @@ export const LoginPage: React.FC = () => {
               )}
             </div>
 
+            {companySelectionError && (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="text-sm text-red-700 font-medium">{companySelectionError}</div>
+                </div>
+              </div>
+            )}
+
             {availableCompanies.length === 0 ? (
               <div className="text-center py-8">
                 <Building className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-sm text-black/60">No hay empresas disponibles</p>
-                <p className="text-xs text-black/40 mt-1">Puede continuar sin seleccionar empresas</p>
+                <p className="text-xs text-black/40 mt-1">No puede registrarse sin empresas aprobadas</p>
               </div>
             ) : (
               <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
@@ -674,6 +686,8 @@ export const LoginPage: React.FC = () => {
                 onClick={() => {
                   setShowCompanySelectionModal(false)
                   setSelectedCompanyIds([])
+                  setCompanySelectionError('')
+                  setLoading(false)
                 }}
                 className="flex-1 px-4 py-3 text-sm font-medium text-black bg-white border border-gray-300 rounded-xl hover:bg-gray-100 transition-all duration-300"
               >
@@ -681,6 +695,11 @@ export const LoginPage: React.FC = () => {
               </button>
               <button
                 onClick={() => {
+                  if (selectedCompanyIds.length === 0) {
+                    setCompanySelectionError('Debe seleccionar al menos una empresa para continuar')
+                    return
+                  }
+                  setCompanySelectionError('')
                   setShowCompanySelectionModal(false)
                   completeRegistration(selectedCompanyIds)
                 }}

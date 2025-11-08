@@ -28,8 +28,6 @@ interface ReceivedDocument {
     rfc?: string
     [key: string]: any
   }
-  gptTitle?: string
-  gptSummary?: string
 }
 
 export const CompanyDashboardPage: React.FC = () => {
@@ -328,9 +326,6 @@ export const CompanyDashboardPage: React.FC = () => {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-black">{doc.fileName}</p>
-                            {doc.gptTitle && (
-                              <p className="text-xs text-black/60">{doc.gptTitle}</p>
-                            )}
                           </div>
                         </div>
                       </td>

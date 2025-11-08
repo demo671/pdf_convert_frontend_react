@@ -1198,7 +1198,7 @@ export const ClientReadyDocumentsPage: React.FC = () => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files && files.length > 0) {
-      const maxSizeBytes = 500 * 1024 // 500KB
+      const maxSizeBytes = 5000 * 1024 // 500KB
       const pdfFiles = Array.from(files).filter(file => file.type === 'application/pdf')
       
       // Validate file sizes
@@ -1239,7 +1239,7 @@ export const ClientReadyDocumentsPage: React.FC = () => {
     setDragActive(false)
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const maxSizeBytes = 500 * 1024 // 500KB
+      const maxSizeBytes = 5000 * 1024 // 500KB
       const pdfFiles = Array.from(e.dataTransfer.files).filter(file => file.type === 'application/pdf')
       
       // Validate file sizes
